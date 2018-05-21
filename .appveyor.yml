@@ -1,0 +1,27 @@
+version: '{build}'
+
+image: Visual Studio 2015
+
+init:
+  - cmd: git config --global core.autocrlf true
+
+platform:
+  - Win32
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+before_build:
+  - cmake -H. -Bbuild -A%PLATFORM% -DBUILD_TESTING=ON -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE
+
+build:
+  project: build\opentracing-cpp.sln
+  parallel: false
+  verbosity: normal
+
+test_script:
+- ps: |
+    cd build
+    ctest -C $env:configuration --timeout 600 --output-on-failure
